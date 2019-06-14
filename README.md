@@ -20,8 +20,8 @@ Usage
 php mapper.php /path/to/html/file1 /path/to/html/file2 ... /path/to/html/filen
 ```
 If all is good: 
-[Imgur](https://i.imgur.com/ldb9ZcN.jpg)
+<img src=https://i.imgur.com/ldb9ZcN.jpg>
 
 In case there your tags are malformed:
-[Imgur](https://i.imgur.com/LoI5BWY.jpg)
+<img src=https://i.imgur.com/LoI5BWY.jpg>
 
