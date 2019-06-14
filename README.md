@@ -9,7 +9,7 @@ Quick start
 ```bash
 git clone https://github.com/Dainerx/mapper_i18n
 cd mapper_i18n
-php mapper.php /path/to/html/file
+php mapper.php /path/to/file
 ```
 
 Requires **PHP 7.0 or newer**
