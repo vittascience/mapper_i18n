@@ -17,7 +17,7 @@ Requires **PHP 7.0 or newer**
 Usage
 -----------
 ```bash
-php mapper.php /path/to/html/file1 /path/to/html/file2 ... /path/to/html/filen
+php mapper.php /path/to/file1 /path/to/file2 ... /path/to/fileN
 ```
 If all is good: 
 <img src=https://i.imgur.com/ldb9ZcN.jpg>
