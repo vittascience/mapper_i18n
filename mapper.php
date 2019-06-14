@@ -1,5 +1,4 @@
 <?php
-
 const VERSION = "0.0.1";
 //output constants
 const OUTPUT_RUNNING = "Running mapper_i18n by Dainer(https://github.com/Dainerx) " . VERSION . " from " . __DIR__ . " ...\n";
