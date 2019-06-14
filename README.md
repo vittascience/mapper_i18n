@@ -12,7 +12,7 @@ cd mapper_i18n
 php mapper.php /path/to/html/file
 ```
 
-Requires PHP 7.0 or newer
+Requires **PHP 7.0 or newer**
 
 Usage
 -----------
