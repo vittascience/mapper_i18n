@@ -25,3 +25,4 @@ If all is good:
 In case there your tags are malformed:
 <img src=https://i.imgur.com/LoI5BWY.jpg>
 
+**Note**: Unlike errors, in case of warning the mapper would still map these tags.
