@@ -1,0 +1,6 @@
+Example1:
+php mapper.php demo/example1/file.html
+Example2:
+php mapper.php demo/example2/file.html
+Example 3:
+php mapper.php demo/example3/file1.html demo/example3/file2.html 
