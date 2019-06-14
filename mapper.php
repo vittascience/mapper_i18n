@@ -1,8 +1,11 @@
 <?php
-const PATTERN_I18N = "/data-i18n[ ]{0,}=[ ]{0,}\".*?\"/";
+const VERSION = "1.0.0";
+//output constants
+const OUTPUT_RUNNING = "Running mapper_i18n by Dainer(https://github.com/Dainerx) " . VERSION . " from " . __DIR__ . " ...\n";
 //output constants
 const OUTPUT_OK = "OK.";
 const OUTPUT_NEWLINE = " \n";
+const OUTPUT_JSON_EXTENSION = ".json";
 //output type constants
 const SUCCESS = "sucess";
 const INFO = "info";
@@ -12,6 +15,8 @@ const BLACK = "40";
 const GREEN = "0;32";
 const RED = "0;31";
 const WHITE = "0;37";
+//other constants
+const PATTERN_I18N = "/data-i18n[ ]{0,}=[ ]{0,}\".*?\"/";
 
 error_reporting(E_ERROR);
 /**
@@ -48,41 +53,32 @@ function strposX($haystack, $needle, $number = '1')
     }
 }
 
-function putValue($start, $keys, $keyToInsert, $isLiteral = false)
+function putKeyAndVal(&$records, $path, $step, $keyToInsert, $valueToInsert)
 {
-    println("key => " . $keyToInsert);
-
-    $path = [];
-    $i = 0;
-    $n = count($keys);
-    while ($i < $n - 1) {
-        $start = $start[$keys[$i]];
-        array_push($path, $keys[$i]);
-        $i++;
+    foreach ($records as $key => $value) {
+        if ($key == $path[$step]) {
+            if ($path[count($path) - 1] == $key) {
+                if (!array_key_exists($keyToInsert, $value))
+                    $value[$keyToInsert] = $valueToInsert; //correct
+                $records[$key] = $value; //correct
+                return $records;
+            } else {
+                $records[$key] = putKeyAndVal($value, $path, $step + 1, $keyToInsert, $valueToInsert);
+            }
+        }
     }
-    if ($isLiteral == true)
-        $start[$keyToInsert] = " ";
-    else
-        $start[$keyToInsert] = array();
-
-    array_push($path, $keyToInsert);
-    $builder[$path[count($path) - 1]] = $start[$keyToInsert];
-    for ($i = count($path) - 2; $i >= 0; $i--) {
-        $builder[$path[$i]] = array($path[$i + 1] => $builder[$path[$i + 1]]);
-    }
-    
-    //$builder = array_reverse($builder);
-    //print_r($builder);
-    //$aa = array_red($builder);
-    //print_r($aa);
-    return $builder;
+    return $records;
 }
+
 function main($argv, $argc)
 {
     $result = [];
-    for ($i = 1; $i < $argc; $i++) {
-        if (file_exists($argv[$i])) {
-            $content =  file_get_contents($argv[$i]);
+    println(OUTPUT_RUNNING);
+    println("Found $argc files");
+    for ($fc = 1; $fc < $argc; $fc++) {
+        $fileFullPath = $argv[$fc];
+        if (file_exists($fileFullPath)) {
+            $content =  file_get_contents($fileFullPath);
             preg_match_all(PATTERN_I18N, $content, $allMatchedArray);
             $allMatched = reset($allMatchedArray);
             foreach ($allMatched as $match) {
@@ -105,17 +101,23 @@ function main($argv, $argc)
 
                 $splittedArray = explode(".", $match);
                 for ($i = 0; $i < count($splittedArray); $i++) {
+                    $keyToInsert = $splittedArray[$i];
                     if ($i == 0) {
-                        if (!array_key_exists($splittedArray[0], $result))
-                            $result[$splittedArray[0]] = array();
+                        if (!array_key_exists($keyToInsert, $result))
+                            $result[$keyToInsert] = array();
                     } else if ($i < count($splittedArray) - 1) {
-                        $result[$splittedArray[0]] = putValue($result[$splittedArray[0]], array_slice($splittedArray, 1, $i), $splittedArray[$i]);
+                        putKeyAndVal($result, array_slice($splittedArray, 0, $i), 0, $keyToInsert, array());
                     } else {
-                        $result[$splittedArray[0]] = putValue($result[$splittedArray[0]], array_slice($splittedArray, 1, $i), $splittedArray[$i], true);
+                        putKeyAndVal($result, array_slice($splittedArray, 0, $i), 0, $keyToInsert, "TO_TRANSLATE");
                     }
                 }
             }
-            print_r($result);
+            println(OUTPUT_OK, SUCCESS);
+            $sepratedPath = explode("/", $fileFullPath);
+            $fileName = $sepratedPath[count($sepratedPath) - 1];
+            $fileNameExtensionFree = explode(".", $fileName)[0];
+            file_put_contents($fileNameExtensionFree . OUTPUT_JSON_EXTENSION, json_encode($result, true));
+            println("Generated " . $fileNameExtensionFree . OUTPUT_JSON_EXTENSION . " from " . $fileFullPath, SUCCESS);
         } else {
             println($argv[i] . " does not exist!", ERROR);
         }
