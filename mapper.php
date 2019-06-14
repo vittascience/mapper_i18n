@@ -1,5 +1,6 @@
 <?php
-const VERSION = "1.0.0";
+
+const VERSION = "0.0.1";
 //output constants
 const OUTPUT_RUNNING = "Running mapper_i18n by Dainer(https://github.com/Dainerx) " . VERSION . " from " . __DIR__ . " ...\n";
 //output constants
@@ -9,11 +10,13 @@ const OUTPUT_JSON_EXTENSION = ".json";
 //output type constants
 const SUCCESS = "sucess";
 const INFO = "info";
+const WARNING = "warning";
 const ERROR = "error";
 //colors
 const BLACK = "40";
 const GREEN = "0;32";
 const RED = "0;31";
+const YELLOW = "1;33";
 const WHITE = "0;37";
 //other constants
 const PATTERN_I18N = "/data-i18n[ ]{0,}=[ ]{0,}\".*?\"/";
@@ -32,6 +35,8 @@ function println($message = "", $type = INFO)
         $color = GREEN;
     else if ($type == ERROR)
         $color = RED;
+    else if ($type==WARNING)
+        $color = YELLOW;
     $output = "\033[" . $color . "m" . $message . "\033[0m";
     echo $output . OUTPUT_NEWLINE;
 }
@@ -53,6 +58,17 @@ function strposX($haystack, $needle, $number = '1')
     }
 }
 
+/**
+ * putKeyAndVal
+ *
+ * @param  mixed $records
+ * @param  mixed $path
+ * @param  mixed $step
+ * @param  mixed $keyToInsert
+ * @param  mixed $valueToInsert
+ *
+ * @return void
+ */
 function putKeyAndVal(&$records, $path, $step, $keyToInsert, $valueToInsert)
 {
     foreach ($records as $key => $value) {
@@ -81,6 +97,8 @@ function main($argv, $argc)
             $content =  file_get_contents($fileFullPath);
             preg_match_all(PATTERN_I18N, $content, $allMatchedArray);
             $allMatched = reset($allMatchedArray);
+            $count_matches = count($allMatched);
+            println("Found $count_matches tags in $fileFullPath");
             foreach ($allMatched as $match) {
                 $match = rtrim($match);
                 $firstOccurence = strposX($match, "\"");
@@ -100,6 +118,10 @@ function main($argv, $argc)
                 }
 
                 $splittedArray = explode(".", $match);
+                if ($splittedArray[0] == "") {
+                    println("Skipping this tag, please check your file near $match", ERROR);
+                    continue;
+                }
                 for ($i = 0; $i < count($splittedArray); $i++) {
                     $keyToInsert = $splittedArray[$i];
                     if ($i == 0) {
@@ -108,6 +130,8 @@ function main($argv, $argc)
                     } else if ($i < count($splittedArray) - 1) {
                         putKeyAndVal($result, array_slice($splittedArray, 0, $i), 0, $keyToInsert, array());
                     } else {
+                        if (strlen($keyToInsert)==0)
+                        println("This tag has no final key, please check your file near $match",WARNING);
                         putKeyAndVal($result, array_slice($splittedArray, 0, $i), 0, $keyToInsert, "TO_TRANSLATE");
                     }
                 }
