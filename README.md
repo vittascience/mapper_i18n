@@ -1,7 +1,7 @@
 mapper_i18n
 ===========
 
-mapper_i18n is a php script that automatically generate json translation files for html files containing jquery.i18n's DATA Api.
+mapper_i18n is a php script that automatically generate json translation files for html files containing [jquery.i18n's DATA Api](https://github.com/wikimedia/jquery.i18n).
 
 Quick start
 -----------
