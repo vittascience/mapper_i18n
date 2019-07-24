@@ -10,18 +10,20 @@
  * PHP version 7.2
  *
  * @author     Oussama Ben Ghorbel <d.oussamabenghorbel@gmail.com>
- * @version    0.0.1
+ * @version    1.1
  * @link       https://github.com/Dainerx/mapper_i18n
  * @see        https://github.com/wikimedia/jquery.i18n
  */
 
-const VERSION = "0.0.1";
+const VERSION = "1.1";
 //output constants
 const OUTPUT_RUNNING = "Running mapper_i18n by Dainer(https://github.com/Dainerx) " . VERSION . " from " . __DIR__ . " ...\n";
-//output constants
 const OUTPUT_OK = "OK.";
 const OUTPUT_NEWLINE = " \n";
 const OUTPUT_JSON_EXTENSION = ".json";
+const OUTPUT_ERROR_COMMAND = "Unkown command, run --help.";
+const OUTPUT_ERROR_ARGS = "Insufficient arguments, run --help.";
+
 //output type constants
 const SUCCESS = "sucess";
 const INFO = "info";
@@ -101,13 +103,13 @@ function putKeyAndVal(&$records, $path, $step, $keyToInsert, $valueToInsert)
     return $records;
 }
 
-function main($argv, $argc)
+function map($files)
 {
     $result = [];
-    println(OUTPUT_RUNNING);
-    println("Found $argc files");
-    for ($fc = 1; $fc < $argc; $fc++) { //fc as for files counter
-        $fileFullPath = $argv[$fc];
+    $filesCount = count($files);
+    println("Found $filesCount files");
+    for ($fc = 0; $fc < $filesCount; $fc++) { //fc as for files counter
+        $fileFullPath = $files[$fc];
         if (file_exists($fileFullPath)) {
             $content =  file_get_contents($fileFullPath);
             preg_match_all(PATTERN_I18N, $content, $allMatchedArray);
@@ -161,7 +163,70 @@ function main($argv, $argc)
             file_put_contents($fileNameExtensionFree . OUTPUT_JSON_EXTENSION, json_encode($result, true));
             println("Generated " . $fileNameExtensionFree . OUTPUT_JSON_EXTENSION . " from " . $fileFullPath, SUCCESS);
         } else {
-            println($argv[i] . " does not exist!", ERROR);
+            println($files[i] . " does not exist!", ERROR);
+        }
+    }
+}
+
+function merge($files)
+{
+    $filesToMergeCount = count($files) - 1;
+    $filesToMerge = array_slice($files, 0, $filesToMergeCount);
+    println("Found $filesToMergeCount file to merge.");
+    $arraysToMerge = [];
+    foreach ($filesToMerge as $fileFullPath) {
+        if (file_exists($fileFullPath)) {
+            $content =  file_get_contents($fileFullPath);
+            array_push($arraysToMerge, json_decode($content, true));
+        } else {
+            println($fileFullPath . " does not exist!", ERROR);
+        }
+    }
+
+    $resultFileFullPath = $files[count($files) - 1];
+    $resultArray = [];
+    foreach ($arraysToMerge as $array) {
+        $resultArray = array_merge_recursive($resultArray, $array);
+    }
+    $sepratedPath = explode("/", $resultFileFullPath);
+    $resultFileName = $sepratedPath[count($sepratedPath) - 1];
+    $resultFileNameExtensionFree = explode(".", $resultFileName)[0];
+    file_put_contents($resultFileNameExtensionFree . OUTPUT_JSON_EXTENSION, json_encode($resultArray, true));
+    println("Generated " . $resultFileNameExtensionFree . OUTPUT_JSON_EXTENSION . " from merging files.", SUCCESS);
+}
+
+function help()
+{
+    println("These are the supported commands by mapper:");
+    println();
+    println("Generate translation files for html files:");
+    println("mapper.php -map /path/to/file1 /path/to/file2 ... /path/to/fileN");
+    println();
+    println("Merge different translation files in one:");
+    println("mapper.php -merge /path/to/file_to_merge_1.json /path/to/file_to_merge_2.json ... /path/to/file_to_merge_N.json /path/to/result_file.json");
+}
+
+function main($argv, $argc)
+{
+    println(OUTPUT_RUNNING);
+    if ($argc <= 1) {
+        println(OUTPUT_ERROR_ARGS, ERROR);
+    } else {
+        $command  = $argv[1];
+        switch ($command) {
+            case '-map':
+                $files = array_slice($argv, 2);
+                map($files);
+                break;
+            case '-merge':
+                $files = array_slice($argv, 2);
+                merge($files);
+                break;
+            case '--help':
+                help();
+                break;
+            default:
+                println(OUTPUT_ERROR_COMMAND, ERROR);
         }
     }
 }

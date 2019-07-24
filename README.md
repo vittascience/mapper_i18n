@@ -9,20 +9,33 @@ Quick start
 ```bash
 git clone https://github.com/Dainerx/mapper_i18n
 cd mapper_i18n
-php mapper.php /path/to/file
+php mapper.php -map /path/to/html/file
 ```
 
 Requires **PHP 7.0 or newer**
 
 Usage
 -----------
+**Map**
+
+Map multiple files to generate .json translation files. 
+
 ```bash
-php mapper.php /path/to/file1 /path/to/file2 ... /path/to/fileN
+php mapper.php -map /path/to/file1 /path/to/file2 ... /path/to/fileN
 ```
 If all is good: 
-<img src=https://i.imgur.com/ldb9ZcN.jpg>
+[map success](https://i.imgur.com/ldb9ZcN.jpg)
 
 In case there your tags are malformed:
-<img src=https://i.imgur.com/LoI5BWY.jpg>
+[map error](https://i.imgur.com/LoI5BWY.jpg)
 
-**Note**: Unlike errors, in case of warning the mapper would still map these tags.
+
+**Merge**
+
+Merge .json translation files into one .json file.
+
+```bash
+php mapper.php -merge /path/to/file_to_merge_1.json /path/to/file_to_merge_2.json ... /path/to/file_to_merge_N.json /path/to/result_file.json
+```
+
+[merge](https://i.imgur.com/5yFKkzv.jpg)
