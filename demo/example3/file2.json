@@ -1,1 +1,20 @@
-{"body":{"buttons":{"hello":"TO_TRANSLATE","Bye":"TO_TRANSLATE"}},"grid":{"topbar":{"link":{"help":"TO_TRANSLATE"},"buttons":{"do":"TO_TRANSLATE","undo":"TO_TRANSLATE","quit":"TO_TRANSLATE"}}}}
+{
+    "body": {
+        "buttons": {
+            "hello": "TO_TRANSLATE",
+            "Bye": "TO_TRANSLATE"
+        }
+    },
+    "grid": {
+        "topbar": {
+            "link": {
+                "help": "TO_TRANSLATE"
+            },
+            "buttons": {
+                "do": "TO_TRANSLATE",
+                "undo": "TO_TRANSLATE",
+                "quit": "TO_TRANSLATE"
+            }
+        }
+    }
+}
